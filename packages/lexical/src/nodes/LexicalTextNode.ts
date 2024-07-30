@@ -1091,6 +1091,7 @@ function convertSpanElement(domNode: Node): DOMConversionOutput {
   // domNode is a <span> since we matched it by nodeName
   const span = domNode as HTMLSpanElement;
   const color = span.style.color;
+  const fontSize = span.style.fontSize;
   // Google Docs uses span tags + font-weight for bold text
   const hasBoldFontWeight = span.style.fontWeight === '700';
   // Google Docs uses span tags + text-decoration: line-through for strikethrough text
@@ -1110,6 +1111,11 @@ function convertSpanElement(domNode: Node): DOMConversionOutput {
       }
       if (color) {
         lexicalNode.setStyle(lexicalNode.getStyle() + `color: ${color};`);
+      }
+      if (fontSize) {
+        lexicalNode.setStyle(
+          lexicalNode.getStyle() + `font-size: ${fontSize};`,
+        );
       }
       if (hasBoldFontWeight) {
         lexicalNode.toggleFormat('bold');
@@ -1142,6 +1148,7 @@ function convertBringAttentionToElement(domNode: Node): DOMConversionOutput {
   // Google Docs wraps all copied HTML in a <b> with font-weight normal
   const hasNormalFontWeight = b.style.fontWeight === 'normal';
   const color = b.style.color;
+  const fontSize = b.style.fontSize;
   return {
     forChild: (lexicalNode) => {
       if ($isTextNode(lexicalNode) && !hasNormalFontWeight) {
@@ -1149,6 +1156,11 @@ function convertBringAttentionToElement(domNode: Node): DOMConversionOutput {
       }
       if ($isTextNode(lexicalNode) && color) {
         lexicalNode.setStyle(lexicalNode.getStyle() + `color: ${color};`);
+      }
+      if ($isTextNode(lexicalNode) && fontSize) {
+        lexicalNode.setStyle(
+          lexicalNode.getStyle() + `font-size: ${fontSize};`,
+        );
       }
 
       return lexicalNode;
@@ -1324,9 +1336,9 @@ function convertTextFormatElement(domNode: Node): DOMConversionOutput {
   if (format === undefined) {
     return {node: null};
   }
-  const color = (domNode as HTMLElement).style
-    ? (domNode as HTMLElement).style.color
-    : '';
+  const b = domNode as HTMLElement;
+  const color = b.style ? b.style.color : '';
+  const fontSize = b.style ? b.style.fontSize : '';
   return {
     forChild: (lexicalNode) => {
       if ($isTextNode(lexicalNode) && !lexicalNode.hasFormat(format)) {
@@ -1334,6 +1346,11 @@ function convertTextFormatElement(domNode: Node): DOMConversionOutput {
       }
       if ($isTextNode(lexicalNode) && color) {
         lexicalNode.setStyle(lexicalNode.getStyle() + `color: ${color};`);
+      }
+      if ($isTextNode(lexicalNode) && fontSize) {
+        lexicalNode.setStyle(
+          lexicalNode.getStyle() + `font-size: ${fontSize};`,
+        );
       }
 
       return lexicalNode;
